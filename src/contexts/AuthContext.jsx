@@ -1,20 +1,21 @@
 /**
  * Authentication Context
- * 
+ *
  * Provides authentication state and methods throughout the application.
  * Implements JWT-based authentication with secure storage and proper state management.
- * 
+ *
  * Features:
  * - User authentication state management
  * - Login/logout functionality
  * - Token persistence
  * - Role-based access control support
- * 
+ *
  * @author Senior Full-Stack Engineer
  * @version 1.0.0
  */
 
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { logUserLogin, logUserLogout } from "../utils/logger";
 
 // Create the authentication context
 const AuthContext = createContext();
@@ -30,7 +31,7 @@ export const useAuth = () => {
 /**
  * Authentication Provider Component
  * Manages authentication state and provides methods to login, logout, etc.
- * 
+ *
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - Child components
  */
@@ -42,10 +43,10 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const token = localStorage.getItem("token");
     const email = localStorage.getItem("email");
-    
+
     return token && email ? { email } : null;
   });
-  
+
   const [loading, setLoading] = useState(true);
 
   /**
@@ -56,12 +57,12 @@ const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem("token");
-        
+
         if (token) {
           // In a real app, we would validate the token with the server
           // For this demo, we'll just check if it exists
           const email = localStorage.getItem("email");
-          
+
           if (email) {
             setUser({ email });
           } else {
@@ -77,7 +78,7 @@ const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    
+
     checkAuth();
   }, []);
 
@@ -90,8 +91,13 @@ const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     // In a real app, this would make an API call
     // For this demo, we just update the state
-    setUser({ email });
-    return { email };
+    const userData = { email };
+    setUser(userData);
+
+    // Log the login activity
+    logUserLogin(userData);
+
+    return userData;
   };
 
   /**
@@ -112,15 +118,20 @@ const AuthProvider = ({ children }) => {
    * Clears authentication data and resets state
    */
   const handleLogout = () => {
+    // Log the logout activity before clearing data
+    if (user) {
+      logUserLogout(user);
+    }
+
     // Clear all auth-related data from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
     localStorage.removeItem("userId");
     localStorage.removeItem("email");
-    
+
     // Reset user state
     setUser(null);
-    
+
     // In a real app, we might also invalidate the token on the server
     console.log("User logged out");
   };
@@ -161,11 +172,7 @@ const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

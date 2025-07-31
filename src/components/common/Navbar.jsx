@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { logUserLogout } from "../../utils/logger";
 import { FaUserCircle, FaTasks } from "react-icons/fa";
 import TaskList from "../tasks/TaskList";
 
@@ -22,13 +23,17 @@ const Navbar = () => {
 
     // Load correct profile from localStorage
     const storedProfile = JSON.parse(localStorage.getItem(isAdminPortal ? "adminProfile" : "userProfile"));
-    
+
     if (storedProfile) {
       setProfile({
         name: storedProfile.name || "User",
         profilePic: storedProfile.profilePic || "",
         role: storedProfile.role || (isAdminPortal ? "admin" : "user"), // Ensure role is set
       });
+    } else {
+      const userRole = localStorage.getItem("userRole");
+      const name = `${userRole?.charAt(0).toUpperCase()}${userRole?.slice(1)}`;
+      setProfile({ name, profilePic: "", role: userRole });
     }
   }, [location.pathname]); // Re-run when path changes
 
@@ -42,7 +47,7 @@ const Navbar = () => {
         setTaskListOpen(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -51,6 +56,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
+      // Log the logout activity before calling logout
+      const email = localStorage.getItem("email");
+      const role = localStorage.getItem("userRole");
+      if (email && role) {
+        logUserLogout({ email, role });
+      }
+
       await logout();
       const isAdminPortal = location.pathname.startsWith("/admin");
 
@@ -128,11 +140,7 @@ const Navbar = () => {
                          hover:bg-blue-700 hover:text-white transition-all focus:outline-none"
             >
               {profile.profilePic ? (
-                <img
-                  src={profile.profilePic}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full object-cover mr-2"
-                />
+                <img src={profile.profilePic} alt="Profile" className="w-8 h-8 rounded-full object-cover mr-2" />
               ) : (
                 <FaUserCircle className="text-2xl mr-2" />
               )}
@@ -145,7 +153,7 @@ const Navbar = () => {
                 <ul className="text-gray-700">
                   <li>
                     <Link
-                      to={profile.role === "admin" ? "/admin/profile" : "/user/profile"}
+                      to={profile.role === "admin" ? "/admin/settings" : "/user/profile"}
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                       onClick={() => setDropdownOpen(false)}
                     >

@@ -53,7 +53,6 @@ const UserPage = () => {
   };
 
   const handleFilterTasks = useCallback(() => {
-    console.log(completionStatus);
     const newTasks = searchTaskValue.trim()
       ? // TODO: If want to search by description, then add task.description.includes(searchTaskValue)
         tasks.filter((task) => task.title.includes(searchTaskValue))

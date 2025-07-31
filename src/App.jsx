@@ -176,7 +176,7 @@ function App() {
                 <Route
                   path="/user/dashboard"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRole="user">
                       <UserDashboard />
                     </ProtectedRoute>
                   }
@@ -184,7 +184,7 @@ function App() {
                 <Route
                   path="/user/userpage"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRole="user">
                       <UserPage />
                     </ProtectedRoute>
                   }
@@ -192,7 +192,7 @@ function App() {
                 <Route
                   path="/user/notifications"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRole="user">
                       <NotificationsPage />
                     </ProtectedRoute>
                   }
@@ -200,7 +200,7 @@ function App() {
                 <Route
                   path="/user/calendar"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRole="user">
                       <CalendarPage />
                     </ProtectedRoute>
                   }
@@ -208,7 +208,7 @@ function App() {
                 <Route
                   path="/user/profile"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRole="user">
                       <ProfilePage />
                     </ProtectedRoute>
                   }
@@ -216,7 +216,7 @@ function App() {
                 <Route
                   path="/user/task-filter"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRole="user">
                       <TaskFilter />
                     </ProtectedRoute>
                   }
